@@ -1,0 +1,94 @@
+<?php
+
+/** 
+ * Common functions for random results
+ * @author: Skrol29
+ * @email:  http://www.randomresult.com/onlyyou.html
+ * @date:   2010-02-25
+*/
+
+// COIN functions
+
+/**
+ * Return an array with coin faces.
+ * @return array Keys are numbers from 0 to ($nbr-1), values are random numbers between 0 and 1.
+ */
+function f_rr_resultset_coin($nbr) {
+    $result = array();
+    for ($i=1;$i<=$nbr;$i++) {
+        $result[] = f_rr_getnum(0,1);
+    }
+    return $result;
+}
+
+// DICE functions
+
+/**
+ * Return an array with dice faces.
+ * @return array Keys are numbers from 0 to ($nbr-1), values are random face number with a random orientation.
+ */
+function f_rr_resultset_dice($nbr) {
+    $result = array();
+    for ($i=1;$i<=$nbr;$i++) {
+        $r = f_rr_getnum(1,6);
+        $result[] = f_rr_dice_ori($r);
+    }
+    return $result;
+}
+
+/**
+ * Give a random face orientation for a given face result.
+ * Some faces of dice may have different orientations.
+ * @return string The number followed by 'e' or nothing.
+ */
+function f_rr_dice_ori($r) {
+    if ( ($r==2) or ($r==3) or ($r==6) ) {
+        $e = (mt_rand(1,2)==1) ? 'e' : '';
+    } else {
+        $e = '';
+    }
+    return $r.$e;
+}
+
+// PICK NUM functions
+
+/**
+ * Randomly pick $nbr numbers between $min and $max included.
+ * Return an array with values.
+ */
+function f_rr_resultset_num($nbr, $min, $max, $distinct) {
+
+    $result = array();
+
+    if ($distinct) {
+        $pick = array();
+        for ($i=$min;$i<=$max;$i++) {
+            $pick[$i] = $i;
+        }
+    }
+    
+    for ($i=1;$i<=$nbr;$i++) {
+        if ($max<$min) break; // security in case $distinct=true 
+        $r = f_rr_getnum($min, $max);
+        if ($distinct) {
+            $z = $r;
+            $r = $pick[$z];
+            for ($j=$z;$j<$max;$j++) {
+                $pick[$j] = $pick[$j+1];
+            }
+            unset($pick[$max]);
+            $max--;
+        }
+        $result[] = $r; 
+    }
+
+    return $result;
+    
+}
+
+/**
+ * Pick a number in a range.
+ */
+function f_rr_getnum($min, $max) {
+    return mt_rand($min,$max);
+}
